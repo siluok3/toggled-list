@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 
 import classes from './App.css';
+import withClass from '../hoc/withClass';
 
 import Persons from '../components/Persons/Persons';
 import Cockpit from '../components/Cockpit/Cockpit';
 import Aux from '../hoc/Aux';
-import withClass from '../hoc/withClass';
+import AuthContext from '../context/auth-context';
+
 
 class App extends Component {
   state = {
@@ -15,6 +17,8 @@ class App extends Component {
       { id: 'sdsd', name: "Kobe", age: 40 },
     ],
     showPersons: false,
+    changeCounter: 0,
+    authenticated: false,
   };
 
   nameChangeHandler = (e, id) => {
@@ -28,7 +32,14 @@ class App extends Component {
 
     const persons = [...this.state.persons];
     persons[personIndex] = person;
-    this.setState({persons: persons});
+
+    //Update state like that when depending on old state
+    this.setState((prevState, props) => {
+      return {
+        persons: persons,
+        changeCounter: prevState.changeCounter + 1
+      };
+    });
   }
 
   deletePersonHandler = (personIndex) => {
@@ -41,6 +52,10 @@ class App extends Component {
     const doesShow = this.state.showPersons;
     this.setState({showPersons: !doesShow});
   };
+
+  loginHandler = () => {
+    this.setState({authenticated: true});
+  }
 
   render() {
     let persons = null;
@@ -56,13 +71,20 @@ class App extends Component {
 
     return (
       <Aux>
-        <Cockpit
-          title={this.props.appTitle}
-          personsLength={this.state.persons.length}
-          showPersons={this.state.showPersons}
-          clicked={this.togglePersonsHandler}
-        /> 
-        {persons}
+        <AuthContext.Provider 
+          value={{
+            authenticated: this.state.authenticated,
+            login:this.loginHandler
+          }}
+        >
+          <Cockpit
+            title={this.props.appTitle}
+            personsLength={this.state.persons.length}
+            showPersons={this.state.showPersons}
+            clicked={this.togglePersonsHandler}
+          /> 
+          {persons}
+        </AuthContext.Provider>
       </Aux>
     );
   }

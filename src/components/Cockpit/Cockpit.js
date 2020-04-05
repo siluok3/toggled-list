@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useContext } from 'react';
 
 import classes from './Cockpit.css';
 
+import AuthContext from '../../context/auth-context';
+
 const cockpit = props => {
+  const authContext = useContext(AuthContext);
+
   const assignedClasses = [];
   let btnClass = [classes.button];
   if (props.showPersons) {
@@ -26,6 +30,7 @@ const cockpit = props => {
       >
         Toggle Persons
       </button>
+      <button onClick={authContext.login}>Log In</button>
     </div>
   );
 };
